@@ -1,13 +1,11 @@
-# Diário de Bordo — Encontro 6
-## O Dilema do Servidor em Nuvem: chamadas de sistema e escalonamento de processos
+### Diário de Bordo — Encontro 6
+#### O Dilema do Servidor em Nuvem: chamadas de sistema e escalonamento de processos
 
-**Aluna:** Yasmin Fernanda de Carvalho
-**Disciplina:** Sistemas Operacionais
+**Aluna:** Yasmin Fernanda de Carvalho<br>
+**Disciplina:** Sistemas Operacionais<br>
 **Data:** 01/10/2026
 
-
-
-## 1. Contexto do problema
+### 1. Contexto do problema
 
 A CloudData mantém sua aplicação em um servidor com **um único núcleo de processamento**. Esse núcleo é disputado por dois tipos de carga:
 
@@ -19,9 +17,7 @@ O servidor usa o escalonamento **FCFS (First-Come, First-Served)**, e a consequ�
 1. A forma como os processos pedem serviços ao kernel, por meio das chamadas de sistema.
 2. A forma como o escalonador decide quem usa a CPU.
 
-
-
-## 2. A barreira entre o programa e o hardware
+### 2. A barreira entre o programa e o hardware
 
 Os processos de usuário não têm acesso direto aos dispositivos. Essa restrição é garantida pelo próprio processador, que possui um **bit de modo** para separar dois níveis de privilégio (SILBERSCHATZ; GALVIN; GAGNE, 2015):
 
@@ -51,9 +47,7 @@ Como o disco é muito mais lento que a CPU, o kernel não mantém o processo ocu
 
 Esse ciclo mostra que o escalonador é acionado com frequência: a cada bloqueio, término ou interrupção, o SO decide qual processo vai usar a CPU em seguida. O critério dessa decisão é o que define se o sistema vai parecer ágil ou travado.
 
-
-
-## 3. Diagnóstico: o FCFS no servidor da CloudData
+### 3. Diagnóstico: o FCFS no servidor da CloudData
 
 O FCFS atende os processos na **ordem de chegada** à fila de prontos. O processo escolhido usa a CPU até terminar ou até se bloquear por conta própria (SILBERSCHATZ; GALVIN; GAGNE, 2015). O algoritmo é simples e justo no sentido da ordem, mas é **não preemptivo**: o sistema operacional não tem o poder de retirar a CPU de um processo que está executando, mesmo que haja trabalho mais urgente esperando (TANENBAUM; BOS, 2016).
 
@@ -85,9 +79,7 @@ renice +10 -p <PID>
 
 O cenário da CloudData equivale, portanto, a manter todos os processos em `SCHED_FIFO` com a mesma prioridade.
 
-
-
-## 4. Proposta de solução: Round-Robin
+### 4. Proposta de solução: Round-Robin
 
 A solução mais adequada para a responsividade da interface é o **Round-Robin (RR)**. Ele mantém os processos prontos em uma **fila circular** e concede a cada um a CPU por, no máximo, um intervalo fixo chamado **quantum**, normalmente entre 10 e 100 ms (TANENBAUM; BOS, 2016; SILBERSCHATZ; GALVIN; GAGNE, 2015).
 
@@ -107,9 +99,7 @@ As alternativas baseadas em duração do processo são menos adequadas:
 
 O Round-Robin não depende de previsão e garante progresso a todos os processos, o que o torna a escolha mais segura para cargas interativas.
 
-
-
-## 5. Prioridades, starvation e aging
+### 5. Prioridades, starvation e aging
 
 Uma alternativa seria usar **escalonamento por prioridades**, com a interface web sempre na prioridade máxima. Isso melhoraria a resposta da interface, mas cria outro risco. Em um servidor com fluxo contínuo de requisições, sempre haveria um processo web pronto, e os relatórios batch poderiam **nunca** receber a CPU. Esse fenômeno é a **starvation (inanição)**: um processo pronto espera indefinidamente porque há sempre outro de maior prioridade à sua frente (SILBERSCHATZ; GALVIN; GAGNE, 2015).
 
@@ -122,17 +112,13 @@ Uma organização ainda mais completa são as **filas multinível com realimenta
 
 Esse esquema combina responsividade para a interface com garantia de progresso para os relatórios (TANENBAUM; BOS, 2016).
 
-
-
-## 6. Conclusão
+### 6. Conclusão
 
 O congelamento da interface da CloudData não é falha de hardware, mas consequência da política de escalonamento. O FCFS, por ser não preemptivo, permite que os trechos longos de processamento dos relatórios bloqueiem o único núcleo e produzam o efeito comboio sobre as requisições web.
 
 A preempção por tempo do Round-Robin, apoiada nas interrupções e na passagem para o modo kernel, que é o mesmo mecanismo usado pelas chamadas de sistema, devolve a responsividade ao sistema. Caso se adote um esquema de prioridades, o uso de aging ou de filas multinível com realimentação é essencial para que os relatórios não sofram starvation.
 
-
-
-## 7. Instrumento visual de síntese
+### 7. Instrumento visual de síntese
 
 O mapa mental conecta os conceitos com as fontes multimídia consultadas:
 - **T** = texto
@@ -168,9 +154,7 @@ mindmap
 
 > Conexão entre as fontes: o podcast (A) discute os modelos de preempção do kernel Linux, isto é, em que momentos o kernel pode tomar a CPU de uma tarefa. Esse é o mecanismo ausente no FCFS e presente no Round-Robin apresentado no vídeo (V). A preempção, por sua vez, depende de interrupções e da entrada no modo kernel, o mesmo caminho percorrido pelas system calls descritas nos textos (T).
 
-
-
-## Referências
+### Referências
 
 LINUX MAN-PAGES PROJECT. **sched(7)**: overview of CPU scheduling. [*S. l.*]: man7.org, 2024a. Disponível em: https://man7.org/linux/man-pages/man7/sched.7.html. Acesso em: 1 out. 2026.
 
