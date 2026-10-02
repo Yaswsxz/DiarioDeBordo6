@@ -34,7 +34,7 @@ Sempre que um programa precisa de algo que só o SO pode fazer, ele usa uma **ch
 
 1. O programa chama uma função da biblioteca padrão, como `read()`.
 2. Essa função coloca nos registradores o número da chamada de sistema e seus parâmetros.
-3. A função executa uma instrução de **trap** (no x86-64, a instrução `syscall`), que muda a CPU para o modo kernel e desvia a execução para o núcleo (TANENBAUM; BOS, 2016; LINUX MAN-PAGES PROJECT, 2024b).
+3. A função executa uma instrução de **trap** (no x86-64, a instrução `syscall`), que muda a CPU para o modo kernel e desvia a execução para o núcleo (MAZIERO, 2019; TANENBAUM; BOS, 2016).
 4. O kernel valida o pedido, confere as permissões e aciona o driver do disco.
 
 Como o disco é muito mais lento que a CPU, o kernel não mantém o processo ocupando o processador enquanto espera:
@@ -67,7 +67,7 @@ Um exemplo numérico mostra o tamanho do problema. Se um trecho do relatório ex
 
 Para o usuário, isso aparece como a interface congelada. Como só existe um núcleo, não há outro processador que possa atender a interface enquanto isso. A responsividade do sistema inteiro passa a depender do processo mais lento da fila. Por isso, Tanenbaum e Bos (2016) consideram algoritmos não preemptivos aceitáveis em sistemas puramente batch, mas inadequados para sistemas interativos.
 
-Vale registrar como isso se reflete em um servidor real. No Linux, o administrador não escolhe um algoritmo para a máquina inteira, mas uma **política de escalonamento por processo** (LINUX MAN-PAGES PROJECT, 2024a):
+Vale registrar como isso se reflete em um servidor real. No Linux, o administrador não escolhe um algoritmo para a máquina inteira, mas uma **política de escalonamento por processo** (MAZIERO, 2019):
 - `SCHED_OTHER` é a política padrão de tempo compartilhado.
 - `SCHED_FIFO` corresponde a um FCFS dentro de um mesmo nível de prioridade.
 - `SCHED_RR` é a variante com fatia de tempo, ou seja, Round-Robin.
@@ -144,9 +144,10 @@ O mapa mental conecta os conceitos com as fontes multimídia consultadas:
 ```mermaid
 mindmap
   root((Servidor CloudData))
-    System Calls - T
+    System Calls - T e A
       read e trap
       Modo Usuário para Modo Kernel
+      Falha no kernel derruba o sistema
       Processo bloqueado na E/S
       Interrupção do disco libera o processo
     FCFS - T e V
@@ -154,7 +155,7 @@ mindmap
       Não preemptivo
       Efeito comboio
       Interface congela
-    Preempção - A e T
+    Preempção - T
       Interrupção do timer
       Kernel pode retomar a CPU
       Troca de contexto
@@ -168,17 +169,15 @@ mindmap
       Filas multinível
 ```
 
-> Conexão entre as fontes: o podcast (A) discute os modelos de preempção do kernel Linux, isto é, em que momentos o kernel pode tomar a CPU de uma tarefa. Esse é o mecanismo ausente no FCFS e presente no Round-Robin apresentado no vídeo (V). A preempção, por sua vez, depende de interrupções e da entrada no modo kernel, o mesmo caminho percorrido pelas system calls descritas nos textos (T).
+> Conexão entre as fontes: o podcast (A) discute o incidente da CrowdStrike de 2024, em que um componente de segurança que executava no nível do kernel do Windows travou milhões de computadores. O caso mostra na prática por que o modo kernel é protegido e por que os programas comuns precisam passar pelas chamadas de sistema descritas nos textos (T). Essa mesma entrada no modo kernel, provocada pela interrupção do temporizador, é o que permite a preempção, ausente no FCFS e presente no Round-Robin apresentado no vídeo (V).
 
 <br>
 
 ### Referências
 
-LINUX MAN-PAGES PROJECT. **sched(7)**: overview of CPU scheduling. [*S. l.*]: man7.org, 2024a. Disponível em: https://man7.org/linux/man-pages/man7/sched.7.html. Acesso em: 1 out. 2026.
+HIPSTERS PONTO TECH. **Incidente Incrível da CloudStrike**: Hipsters Ponto Tech #421. [*S. l.*]: Alura, 23 jul. 2024. Podcast (53 min). Disponível em: https://www.alura.com.br/podcast/incidente-incrivel-da-cloudstrike-hipsters-ponto-tech-421-a9376. Acesso em: 1 out. 2026.
 
-LINUX MAN-PAGES PROJECT. **syscalls(2)**: Linux system calls. [*S. l.*]: man7.org, 2024b. Disponível em: https://man7.org/linux/man-pages/man2/syscalls.2.html. Acesso em: 1 out. 2026.
-
-LINUX UNPLUGGED. **593**: Zen and the Art of Kernel Preempting. [*S. l.*]: Jupiter Broadcasting, 15 dez. 2024. Podcast. Disponível em: https://linuxunplugged.com/593. Acesso em: 1 out. 2026.
+MAZIERO, Carlos Alberto. **Sistemas operacionais**: conceitos e mecanismos. Curitiba: Editora da UFPR, 2019. Disponível em: http://wiki.inf.ufpr.br/maziero/doku.php?id=socm:start. Acesso em: 1 out. 2026.
 
 SILBERSCHATZ, Abraham; GALVIN, Peter Baer; GAGNE, Greg. **Fundamentos de sistemas operacionais**. 9. ed. Rio de Janeiro: LTC, 2015.
 
