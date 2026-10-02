@@ -1,9 +1,13 @@
-### Diário de Bordo — Encontro 6
-#### O Dilema do Servidor em Nuvem: chamadas de sistema e escalonamento de processos
+<h3 align="center">Diário de Bordo — Encontro 6</h3>
+<h4 align="center">O Dilema do Servidor em Nuvem: chamadas de sistema e escalonamento de processos</h4>
+
+<br>
 
 **Aluna:** Yasmin Fernanda de Carvalho<br>
 **Disciplina:** Sistemas Operacionais<br>
 **Data:** 01/10/2026
+
+<br>
 
 ### 1. Contexto do problema
 
@@ -16,6 +20,8 @@ O servidor usa o escalonamento **FCFS (First-Come, First-Served)**, e a consequ�
 
 1. A forma como os processos pedem serviços ao kernel, por meio das chamadas de sistema.
 2. A forma como o escalonador decide quem usa a CPU.
+
+<br>
 
 ### 2. A barreira entre o programa e o hardware
 
@@ -46,6 +52,8 @@ Como o disco é muito mais lento que a CPU, o kernel não mantém o processo ocu
 | Novo escalonamento | Usuário | Executando |
 
 Esse ciclo mostra que o escalonador é acionado com frequência: a cada bloqueio, término ou interrupção, o SO decide qual processo vai usar a CPU em seguida. O critério dessa decisão é o que define se o sistema vai parecer ágil ou travado.
+
+<br>
 
 ### 3. Diagnóstico: o FCFS no servidor da CloudData
 
@@ -79,6 +87,8 @@ renice +10 -p <PID>
 
 O cenário da CloudData equivale, portanto, a manter todos os processos em `SCHED_FIFO` com a mesma prioridade.
 
+<br>
+
 ### 4. Proposta de solução: Round-Robin
 
 A solução mais adequada para a responsividade da interface é o **Round-Robin (RR)**. Ele mantém os processos prontos em uma **fila circular** e concede a cada um a CPU por, no máximo, um intervalo fixo chamado **quantum**, normalmente entre 10 e 100 ms (TANENBAUM; BOS, 2016; SILBERSCHATZ; GALVIN; GAGNE, 2015).
@@ -99,6 +109,8 @@ As alternativas baseadas em duração do processo são menos adequadas:
 
 O Round-Robin não depende de previsão e garante progresso a todos os processos, o que o torna a escolha mais segura para cargas interativas.
 
+<br>
+
 ### 5. Prioridades, starvation e aging
 
 Uma alternativa seria usar **escalonamento por prioridades**, com a interface web sempre na prioridade máxima. Isso melhoraria a resposta da interface, mas cria outro risco. Em um servidor com fluxo contínuo de requisições, sempre haveria um processo web pronto, e os relatórios batch poderiam **nunca** receber a CPU. Esse fenômeno é a **starvation (inanição)**: um processo pronto espera indefinidamente porque há sempre outro de maior prioridade à sua frente (SILBERSCHATZ; GALVIN; GAGNE, 2015).
@@ -112,11 +124,15 @@ Uma organização ainda mais completa são as **filas multinível com realimenta
 
 Esse esquema combina responsividade para a interface com garantia de progresso para os relatórios (TANENBAUM; BOS, 2016).
 
+<br>
+
 ### 6. Conclusão
 
 O congelamento da interface da CloudData não é falha de hardware, mas consequência da política de escalonamento. O FCFS, por ser não preemptivo, permite que os trechos longos de processamento dos relatórios bloqueiem o único núcleo e produzam o efeito comboio sobre as requisições web.
 
 A preempção por tempo do Round-Robin, apoiada nas interrupções e na passagem para o modo kernel, que é o mesmo mecanismo usado pelas chamadas de sistema, devolve a responsividade ao sistema. Caso se adote um esquema de prioridades, o uso de aging ou de filas multinível com realimentação é essencial para que os relatórios não sofram starvation.
+
+<br>
 
 ### 7. Instrumento visual de síntese
 
@@ -153,6 +169,8 @@ mindmap
 ```
 
 > Conexão entre as fontes: o podcast (A) discute os modelos de preempção do kernel Linux, isto é, em que momentos o kernel pode tomar a CPU de uma tarefa. Esse é o mecanismo ausente no FCFS e presente no Round-Robin apresentado no vídeo (V). A preempção, por sua vez, depende de interrupções e da entrada no modo kernel, o mesmo caminho percorrido pelas system calls descritas nos textos (T).
+
+<br>
 
 ### Referências
 
