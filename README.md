@@ -1,5 +1,5 @@
-<h3 align="center">Diário de Bordo — Encontro 6</h3>
-<h4 align="center">O Dilema do Servidor em Nuvem: chamadas de sistema e escalonamento de processos</h4>
+# Diário de Bordo — Encontro 6
+#### O Dilema do Servidor em Nuvem: chamadas de sistema e escalonamento de processos
 
 <br>
 
