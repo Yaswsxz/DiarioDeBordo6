@@ -5,7 +5,7 @@
 **Disciplina:** Sistemas Operacionais
 **Data:** 01/10/2026
 
----
+
 
 ## 1. Contexto do problema
 
@@ -19,7 +19,7 @@ O servidor usa o escalonamento **FCFS (First-Come, First-Served)**, e a consequ�
 1. A forma como os processos pedem serviços ao kernel, por meio das chamadas de sistema.
 2. A forma como o escalonador decide quem usa a CPU.
 
----
+
 
 ## 2. A barreira entre o programa e o hardware
 
@@ -51,7 +51,7 @@ Como o disco é muito mais lento que a CPU, o kernel não mantém o processo ocu
 
 Esse ciclo mostra que o escalonador é acionado com frequência: a cada bloqueio, término ou interrupção, o SO decide qual processo vai usar a CPU em seguida. O critério dessa decisão é o que define se o sistema vai parecer ágil ou travado.
 
----
+
 
 ## 3. Diagnóstico: o FCFS no servidor da CloudData
 
@@ -85,7 +85,7 @@ renice +10 -p <PID>
 
 O cenário da CloudData equivale, portanto, a manter todos os processos em `SCHED_FIFO` com a mesma prioridade.
 
----
+
 
 ## 4. Proposta de solução: Round-Robin
 
@@ -107,7 +107,7 @@ As alternativas baseadas em duração do processo são menos adequadas:
 
 O Round-Robin não depende de previsão e garante progresso a todos os processos, o que o torna a escolha mais segura para cargas interativas.
 
----
+
 
 ## 5. Prioridades, starvation e aging
 
@@ -122,7 +122,7 @@ Uma organização ainda mais completa são as **filas multinível com realimenta
 
 Esse esquema combina responsividade para a interface com garantia de progresso para os relatórios (TANENBAUM; BOS, 2016).
 
----
+
 
 ## 6. Conclusão
 
@@ -130,45 +130,45 @@ O congelamento da interface da CloudData não é falha de hardware, mas consequ�
 
 A preempção por tempo do Round-Robin, apoiada nas interrupções e na passagem para o modo kernel, que é o mesmo mecanismo usado pelas chamadas de sistema, devolve a responsividade ao sistema. Caso se adote um esquema de prioridades, o uso de aging ou de filas multinível com realimentação é essencial para que os relatórios não sofram starvation.
 
----
+
 
 ## 7. Instrumento visual de síntese
 
 O mapa mental conecta os conceitos com as fontes multimídia consultadas:
-- **[T]** texto
-- **[V]** vídeo
-- **[A]** áudio
+- **T** = texto
+- **V** = vídeo
+- **A** = áudio
 
 ```mermaid
 mindmap
-  root((Servidor CloudData<br/>núcleo único))
-    System Calls [T]
+  root((Servidor CloudData))
+    System Calls - T
       read e trap
       Modo Usuário para Modo Kernel
       Processo bloqueado na E/S
       Interrupção do disco libera o processo
-    FCFS [T][V]
+    FCFS - T e V
       Ordem de chegada
       Não preemptivo
       Efeito comboio
       Interface congela
-    Preempção [A][T]
+    Preempção - A e T
       Interrupção do timer
       Kernel pode retomar a CPU
       Troca de contexto
-    Round-Robin [V][T]
+    Round-Robin - V e T
       Quantum de 10 a 100 ms
       Fila circular
       Boa resposta interativa
-    Prioridades [T][V]
+    Prioridades - T e V
       Starvation
       Aging
       Filas multinível
 ```
 
-> Conexão entre as fontes: o podcast [A] discute os modelos de preempção do kernel Linux, isto é, em que momentos o kernel pode tomar a CPU de uma tarefa. Esse é o mecanismo ausente no FCFS e presente no Round-Robin apresentado no vídeo [V]. A preempção, por sua vez, depende de interrupções e da entrada no modo kernel, o mesmo caminho percorrido pelas system calls descritas nos textos [T].
+> Conexão entre as fontes: o podcast (A) discute os modelos de preempção do kernel Linux, isto é, em que momentos o kernel pode tomar a CPU de uma tarefa. Esse é o mecanismo ausente no FCFS e presente no Round-Robin apresentado no vídeo (V). A preempção, por sua vez, depende de interrupções e da entrada no modo kernel, o mesmo caminho percorrido pelas system calls descritas nos textos (T).
 
----
+
 
 ## Referências
 
